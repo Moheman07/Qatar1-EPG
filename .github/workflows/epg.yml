@@ -1,0 +1,34 @@
+name: Generate Qatar1 EPG
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # كل يوم الساعة 3 صباحاً UTC
+  workflow_dispatch:     # لتشغيله يدويًا عند الحاجة
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.x
+
+    - name: Install dependencies
+      run: pip install requests
+
+    - name: Run EPG generator
+      run: python generate_epg.py
+
+    - name: Commit changes
+      run: |
+        git config user.name "GitHub Action"
+        git config user.email "action@github.com"
+        git add .
+        git commit -m "Auto-update EPG file"
+        git push
+      continue-on-error: true  # لا يتوقف لو لم يكن هناك تغييرات
