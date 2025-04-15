@@ -32,40 +32,10 @@ def download_epg():
         raise Exception(f"Failed to download EPG: {response.status_code}")
 
 def apply_changes():
-    # افتراضياً قائمة تحتوي على تغييرات التصنيف
-    categories = {
-        'Premier League': 'Football',
-        'Formula 1': 'Motorsport',
-        'UEFA Champions League': 'Football',
-        'Bundesliga': 'Football',
-        'La Liga': 'Football',
-        'NBA': 'Basketball',
-        'AFC': 'Football',
-        'EFL': 'Football'
-        # يمكن إضافة تصنيفات أخرى هنا
-    }
-
     for old_text, new_text in List_Chang:
         for line in fileinput.input(input_path, inplace=True):
             line = line.replace(old_text, new_text)
             print(line, end='')
-
-    # إضافة التصنيفات إلى البرنامج
-    with open(input_path, 'r', encoding='utf-8') as f:
-        xml_data = f.read()
-
-    def add_category_to_programme(match):
-        title = match.group(1)
-        category = categories.get(title, 'Other')  # إذا لم يتوفر تصنيف، سيتم تصنيفه كـ 'Other'
-        return f'<programme start="{match.group(2)}" stop="{match.group(3)}" channel="{match.group(4)}">\n<title>{title}</title>\n<category>{category}</category>\n<desc>{match.group(5)}</desc>\n</programme>'
-
-    # تعديل البرامج وإضافة التصنيفات
-    xml_data = re.sub(r'<programme start="(\d{14}) \+0000" stop="(\d{14}) \+0000" channel="([^"]+)"><title>([^<]+)</title><desc>([^<]+)</desc>', add_category_to_programme, xml_data)
-
-    # حفظ التعديلات في الملف
-    with open(input_path, 'w', encoding='utf-8') as f:
-        f.write(xml_data)
-    print("✅ تم إضافة التصنيفات للبرامج.")
 
 def adjust_times():
     with io.open(input_path, 'r', encoding='utf-8') as f:
